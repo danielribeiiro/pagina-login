@@ -4,7 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import java.util.Optional;
+
+
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -27,7 +30,11 @@ public class LoginController {
         Usuario usuario = new Usuario();
         usuario.setEmail(dados.email());
         usuario.setSenha(encoder.encode(dados.senha()));
-        repository.save(usuario);
+      try {
+    repository.save(usuario);
+} catch (DataIntegrityViolationException e) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body("E-mail já cadastrado");
+}
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuário cadastrado");
     }
 
